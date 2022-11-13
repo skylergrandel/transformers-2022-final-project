@@ -11,22 +11,45 @@ It is very difficult to qualitatively assess comments (or really anything) in a 
 To develop a classification schema, we classified comments by the information they provide about the associated code until we reached saturation. This means that we determined what information the comment contained and placed it in the appropriate category; if no appropriate category existed, we created a new category until we were reasonably sure that no more categories existed (saturation in this case was defined as classifying at least 100 comments without discovering a new category). The resulting categories are listed below:
 
 0: Function (A comment that describes a function. Typically a comment is in this cat iff it's javadoc style and it's not a copyright comment)
+
 1: Variable (Describe Variable/Constant) 
+
 2: Functionality (Describe block functionality; usually just summarizes or describes what the following lines of code do; specifically inline)
+
 3: Branch (Describe possible branches and/or preconditions)
+
 4: Reasoning (Describe reasoning behind implementation decisions)
+
 5: Quirk (Random quirk of the code, authors trying to be funny, niche problems the code can run into, etc)
+
 6: Use guidelines (Comments that tell readers how to use a function/container/variable but dont describe their function)
-7: Source (Describe Code Source; comments like /* This code was stolen from \[some stack overflow link\]*/)
+
+7: Source (Describe Code Source; comments like /\* This code was stolen from \[some stack overflow link\]\*/)
+
 8: Copyright (Copyright and author info)
-9: Section (comments like, /* The following tests are to test foo() */ or /* Setter and Getter methods */)
+
+9: Section (comments like, /\* The following tests are to test foo() \*/ or /\* Setter and Getter methods \*/)
+
 10: Code (commented out code)
+
 11: Task (TODOs, FIXMEs, etc.)
 
-To automatically classify these comments, we fine tuned a roBERTa based classification transformer on a dataset of manually labeled comments. 
+To automatically classify these comments, we fine tuned a roBERTa based classification transformer on a dataset of manually labeled comments. This utilizes the transformer as a feature selector to vectorize the comment and a NN based classifier head.
 
 ### Improving the Model
-Various different models were evaluated on this task and many different methods were used to improve performance.
+Various different models were evaluated on this task and many different methods were used to improve performance. Multiple classification heads were tested and an SVM with an RBF kernel actually worked the best for a long time (likely due our limited training data). Multiple transformer models were tested as well, but roBERTa achieved the best results. We also performed domain adaptation by fine-tuning the language model on a dataset of over 1 million unlabeled comments, but this failed to improve our results. We also tried various data preprocessing steps, changing the comments to the following forms:
+
+\"/\*   This is the original form \*/    /\*  of a multiline comment, and it has special characters like +-@ and stars and slashes \*/    \"
+
+\"   This is the form      of a multiline comment, and it still has special characters like +-@ but no stars or slashes    \"
+
+\"   This is the form      of a multiline comment and it no longer has special characters or stars or slashes    \"
+
+\"This is the form of a multiline comment and it no longer has special characters like or stars or slashes and extra spaces are removed\"
+
+Each of these forms performed about the same with the SVM head, but removing all special characters actually caused the NN head to achieve similar results to the SVM head. However, removing extra spaces tanked the performance for all heads, leading us to the conclusion that the model utilizes the spaces rather than the special characters to interpret the format of the comment. With this change, we attempted domain adaptation again, resulting in a significant improvement in the NN head's performance over that of the SVM head.
+
+The final model (at time of writing) achieves an accuracy of ~85% and an F1 score of ~0.86. Furthermore, if we assume that categories 0 through 3 are "good" comments and categories 4 through 11 are "bad" comments and we thus reduce the problem to a binary classification problem, we achieve an accuracy of ~95%.
 
 ## Critical Analysis
 ### Broader Impact
@@ -41,8 +64,11 @@ Outside of the model itself, the usefulness of each category of comments still n
 The model can be found on [this huggingface page](https://huggingface.co/skylergrandel/Comcat).
 
 Here are a few papers for some background on comments, comment categorization, and automatic comment generation:
+
 Steidl et al. classify comments into seven categories using older ML techniques in [“Quality analysis of source code comments”](https://ieeexplore.ieee.org/document/6613836)
+
 Song et al. identify quality evaluation criteria for comments and survey general methods of comment generation in [“A Survey of Automatic Generation of Source Code Comments: Algorithms and Techniques”](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8778714)
+
 Khamis et al. automatically evaluate comments on readability, consistency, and completeness of documentation in [“Automatic quality assessment of source code comments: The javadocminer”](https://www.researchgate.net/profile/Juergen-Rilling/publication/221474509_Automatic_Quality_Assessment_of_Source_Code_Comments_The_JavadocMiner/links/0046352d5ad855f900000000/Automatic-Quality-Assessment-of-Source-Code-Comments-The-JavadocMiner.pdf)
 
 This model is based on roBERTa, which you can read about [here](https://arxiv.org/pdf/1907.11692.pdf%5C)
