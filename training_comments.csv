@@ -1,0 +1,766 @@
+﻿/*
+ * Test whether a block is completely empty, i.e. contains no marked
+ * objects.  This does not require the block to be in physical
+ * memory.
+ */0
+/*
+ * Clear all obj_link pointers in the list of free objects *flp.
+ * Clear *flp.
+ * This must be done before dropping a list of free gcj-style objects,
+ * since may otherwise end up with dangling "descriptor" pointers.
+ * It may help for other pointer-containing objects.
+ */0
+/*
+ * Perform GC_reclaim_block on the entire heap, after first clearing
+ * small object free lists (if we are not just looking for leaks).
+ */0
+/*
+ * Return a pointer to the free block ending just before h, if any.
+ */0
+/*
+ * Free a heap block.
+ *
+ * Coalesce the block with its neighbors if possible.
+ *
+ * All mark words are assumed to be cleared.
+ */0
+/* Number of set bits in a word.  Not performance critical.     */1
+/* Map size 0 to something bigger.                      */1
+/* The size we try to preserve.         */1
+/* The lowest indexed entry we  *//* initialize.                  */1
+/* p is assumed to point to a legitimate object in our part     *//* of the heap.                                                 */1
+/* Set up the size 0 free lists.        */1
+/* *my_fl is updated while the collector is excluded;   */1
+/* Similar to GC_local_gcj_malloc, but the size is in words, and we don't       *//* adjust it.  The size is assumed to be such that it can be    *//* allocated as a small object.                                 */1
+/* Make sure it's not reclaimed this cycle */2
+/* Clear both lists.*/2
+/* Check whether a small object block is nearly full by looking at only *//* the mark bits.                                                       */2
+/* Return the number of set mark bits in the given header       */0
+/* Abort if a GC_reclaimable object is found */2
+/* Clear reclaim- and free-lists */2
+/* Go through all heap blocks (in hblklist) and reclaim unmarked objects */2
+/* Set things up so that GC_size_map[i] >= words(i),            *//* but not too much bigger                                              *//* and so that size_map contains relatively few distinct entries        */2
+/* Make all sizes up to 32 words predictable, so that a         *//* compiler can statically perform the same computation,        *//* or at least a computation that results in similar size       *//* classes.                                                     */2
+/* Fill in additional entries in GC_size_map, including the ith one */2
+/* Clear some of the inaccessible part of the stack.  Returns its       *//* argument, so it can be used in a tail call position, hence clearing  *//* another frame.                                                       */0
+/* Used to occasionally clear a bigger   *//* chunk.                                */2
+/* Extra bytes we clear every time.  This clears our own        *//* activation record, and should cause more frequent            *//* clearing near the cold end of the stack, a good thing.       */2
+/* We make GC_high_water this much hotter than we really saw    *//* saw it, to cover for GC noise etc. above our current frame.  */5
+/* Make it sufficiently aligned for assembly    *//* implementations of GC_clear_stack_inner.     */2
+/* Start things over, so we clear the entire stack again */2
+/* Make it sufficiently aligned for assembly    */
+/* implementations of GC_clear_stack_inner.     */2
+/* Restart clearing process, but limit how much clearing we do. */2
+/* Make sure marker threads and started and thread local *//* allocation is initialized, in case we didn't get      *//* called from GC_init_parallel();                       */2
+/* Install looping handler before the write fault handler, so we        *//* handle write faults correctly.                                       */2
+/* Adjust normal object descriptor for extra allocation.        */2
+/* Add initial guess of root sets.  Do this first, since sbrk(0)        *//* might be used.                                                       */2
+/* Preallocate large object map.  It's otherwise inconvenient to        *//* deal with failure.                                           */2
+/* Get black list set up and/or incremental GC started */2
+/* Convince lint that some things are used */2
+/* Map a number of blocks to the appropriate large block free list index. */2
+/* Return the free list index on which the block described by the header *//* appears, or -1 if it appears nowhere.                                 */0
+/* Merge in contiguous sections.        */2
+/* Unmap blocks that haven't been recently touched.  This is the only way *//* way blocks are ever unmapped.                                          */2
+/* Merge all unmapped blocks that are adjacent to other free            *//* blocks.  This may involve remapping, since all blocks are either     *//* fully mapped or fully unmapped.                                      */2
+/* Coalesce with successor, if possible */2
+/* make both consistent, so that we can merge */2
+/* Unmap any gap in the middle */2
+/* Start over at beginning of list */2
+/* Check for duplicate deallocation in the easy case */2
+/* Coalesce with successor, if possible */2
+/* Coalesce with predecessor, if possible. */2
+/* Check whether object with base pointer p has debugging info  */2
+/* Check the object with debugging info at ohdr         *//* return NIL if it's OK.  Else return clobbered        *//* address.                                             */3
+/* Print a type description for the object whose client-visible address *//* is p.                                                                */2
+/* Print all objects on the list.  Clear the list.      */2
+/* Recover the contents of the freelist array fl into the global one gfl.*/2
+/* Concatenate: */2
+/* Clear fl[i], since the thread structure may hang around.     */2
+/* Each thread structure must be initialized.   */2
+/* We assert that any concurrent marker will stop us.   */2
+/* We must update the freelist before we store the pointer.     */2
+/* resynchronize if we get far off, e.g. because GC_mark_no     *//* wrapped.                                                     */2
+/* Add a thread to GC_threads.  We assume it wasn't already there.      */2
+/* Delete a thread from GC_threads.  We assume it is there.     *//* (The code intentionally traps if it wasn't.)                 */2
+/* Return a GC_thread corresponding to a given pthread_t.       */2
+/* set -1 for error */1
+/* We hold the GC lock.  Wait until an in-progress GC has finished.	*//* Repeatedly RELEASES GC LOCK in order to wait.			*//* If wait_for_all is true, then we exit with the GC lock held and no	*//* collection in progress; otherwise we just wait for the current GC	*//* to finish.								*/2
+/* otherwise free list objects are marked,      *//* and its safe to leave them                   */3
+/* or enqueue the block for later processing.                              */3
+/* insert at the middle */2
+/* insert at the beginning */2
+/* insert at the end */2
+/* If we can fit the same number of larger objects in a block,  *//* do so.                                                       */3
+/* If they are both unmapped, we merge, but leave unmapped. */3
+/* not mergable with successor */3
+/* insert at the middle */2
+/* insert at the beginning */2
+/* insert at the end */2
+/* In the incremental case, we always have to take this *//* path.  Thus we leave the counter alone.              */3
+/* Returns 0 if it's not there.                                 */3
+/* If there is more than one thread with the given id we        *//* return the most recent one.                                  */3
+/*
+ * This happens if we are called before GC_thr_init ().
+ */3
+/* Return the number of processors, or i<= 0 if it can't be determined. */3
+/* We manually precomputed the mark bit patterns that need to be        *//* checked for, and we give up on the ones that are unlikely to occur,  *//* or have period > 3.                                                  */2
+/* This avoids problems at lower levels.                */4
+/* We leave the rest of the array to be filled in on demand. */4
+/* We assume the ith entry is currently 0.                              */4
+/* We restart the clearing process after this many bytes of     *//* allocation.  Otherwise very heavily recursive programs       *//* with sparse stacks may result in heaps that grow almost      *//* without bounds.  As the heap gets larger, collection         *//* frequency decreases, thus clearing frequency would decrease, *//* thus more junk remains accessible, thus the heap gets        *//* larger ...                                                   */4
+/* Adjust normal object descriptor for extra allocation.        */2
+/* If we are keeping back pointers, the GC itself dirties all   *//* pages on which objects have been marked, making              *//* incremental GC pointless.                                    */4
+/* There may be unmarked reachable objects      */4
+/* else we're OK in assuming everything's       *//* clean since nothing can point to an          *//* unmarked object.                             */3
+/* In many cases it's easier to debug a running process.        *//* It's arguably nicer to sleep, but that makes it harder       *//* to look at the thread if the debugger doesn't know much      *//* about threads.                                               */4
+/* We hold the allocator lock.                                          */4
+/* Do it in a way that is likely to trap if we access it.       */2
+/* the free list is always visible to the collector as  *//* such.                                                        */4
+/* We must update the freelist before we store the pointer.     *//* Otherwise a GC at this point would see a corrupted   *//* free list.                                           *//* A memory barrier is probably never needed, since the         *//* action of stopping this thread will cause prior writes       *//* to complete.                                         */4
+/* We must explicitly mark ptrfree and gcj free lists, since the free   *//* list links wouldn't otherwise be found.  We also set them in the     *//* normal free lists, since that involves touching less memory than if  *//* we scanned them normally.                                            */4
+/* We treat hb_marks as an array of words here, even if it is   *//* actually an array of bytes.  Since we only check for zero, there     *//* are no endian-ness issues.                                   */5
+/* This would be a lot easier with a mark bit per object instead of per *//* word, but that would rewuire computing object numbers in the mark    *//* loop, which would require different data structures ...              */5
+/* This kind not used.  */5
+/* One word objects don't have to be 2 word aligned,    *//* unless we're using mark bytes.                       */5
+/* Note that a filled in section of the array ending at n always    *//* has length at least n/4.                                             */5
+/* We need one extra byte; don't fill in GC_size_map[byte_sz] */5
+/* Hotter than actual sp */5
+/* The following may fail, since we may rely on         *//* alignment properties that may not hold with a user set       *//* GC_stackbottom.                                              */5
+/* Before write fault handler! */5
+/* Can't easily do it. */5
+/* This excludes the check as to whether the back pointer is    *//* odd, which is added by the GC_HAS_DEBUG_INFO macro.          */5
+/* This assumes that all accessible objects are marked, and that        *//* I hold the allocation lock.  Normally called by collector.           */6
+/* Note that if DBG_HDRS_ALL is set, uncollectable objects      *//* on free lists may not have debug information set.  Thus it's *//* not always safe to return TRUE, even if the client does      *//* its part.                                                    */5
+/* Note that the indexing scheme differs, in that gfl has finer size    *//* resolution, even if not all entries are used.                        */5
+/* We currently only do this from the thread itself or from     *//* the fork handler for a child process.                        */6
+/* This can happen if we get called when the world is   *//* being initialized.  Whether we can actually complete *//* the initialization then is unclear.                  */5
+/* Thus it is impossible for a mark procedure to see the        *//* allocation of the next object, but to see this object        *//* still containing a free list pointer.  Otherwise the         *//* marker might find a random "mark descriptor".                */5
+/* GC_mark_no is passed only to allow GC_help_marker to terminate       *//* promptly.  This is important if it were called from the signal       *//* handler or from the GC lock acquisition code.  Under Linux, it's     *//* not safe to call it from a signal handler, since it uses mutexes     *//* and condition variables.  Since it is called only here, the  *//* argument is unnecessary.                                             */5
+/* If a thread has been joined, but we have not yet             *//* been notified, then there may be more than one thread        *//* in the table with the same pthread id.                       */5
+/* This is a very stupid thing to do.  We make it possible anyway,      *//* so that you can convince yourself that it really is very stupid.     */5
+/* Shouldn't be used in any standard config.    */6
+/* This must be called WITHOUT the allocation lock held and before any threads are created */6
+/* word should be unsigned */6
+/* Object may have had debug info, but has been deallocated     */6
+/* This should preclude free list objects except with   *//* thread-local allocation.                             */6
+/* Used internally; we assume it's called correctly.    */6
+/* This call must be made from the new thread.  */6
+/* This is stolen from Russ Atkinson's Cedar quantization               *//* alogrithm (but we precompute it).                            */7
+/* <takis@XFree86.Org> */7
+/*
+ * Copyright 1988, 1989 Hans-J. Boehm, Alan J. Demers
+ * Copyright (c) 1991-1995 by Xerox Corporation.  All rights reserved.
+ * Copyright (c) 1997 by Silicon Graphics.  All rights reserved.
+ * Copyright (c) 1999-2004 Hewlett-Packard Development Company, L.P.
+ *
+ * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY EXPRESSED
+ * OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.
+ *
+ * Permission is hereby granted to use or copy this program
+ * for any purpose,  provided the above notices are retained on all copies.
+ * Permission to modify the code and to distribute modified code is granted,
+ * provided the above notices are retained, and a notice that the code was
+ * modified is included with the above copyright notice.
+ */8
+/*
+ * reclaim phase
+ *
+ */9
+/*ARGSUSED*/9
+/* MSWIN32 */10
+/* Helper procedures for new kind creation.     */9
+/*ARGSUSED*/9
+/*ARGSUSED*/9
+/* Active CPUs */9
+/* PARALLEL_MARK || THREAD_LOCAL_ALLOC */10
+/* !SMALL_CONFIG */10
+/* USE_MUNMAP */10
+/* while (h != 0) ... */10
+/* for ... */10
+/*   GC_fprintf1( "\n\n\n\n --- Deregister %x ---\n\n\n\n\n", me->flags ); */10
+/*      GC_fprintf0( "\n\n\n\n --- FOO ---\n\n\n\n\n" ); */10
+/* !PARALLEL_MARK */10
+/* GC_GCJ_SUPPORT */10
+/* NACL */9
+/* HANDLE_FORK */10
+/* GC_LINUX_THREADS */10
+/* NO_DEBUGGING */9
+/* Should be more random than it is ... */11
+/* No writing.  */6
+/* FIXME: It is not clear we really always want to do these merges      *//* with -DUSE_MUNMAP, since it updates ages and hence prevents  *//* unmapping.                                                   */11
+/*
+ * gcc errors out with /tmp/ccdPMFuq.s:2994: Error: symbol `.LTLS4' is already defined
+ * if the inline is added on powerpc
+ */11
+/*
+ * gcc-3.3.6 miscompiles the &GC_thread_key+sizeof(&GC_thread_key) expression so
+ * put it into a separate function.
+ */11
+/* This is OK, but we need a way to delete a specific one.      */11
+/* GC_DGUX386_THREADS */9
+/* HANDLE_FORK */10
+/* !GC_DARWIN_THREADS */10
+/* GENERIC_COMPARE_AND_SWAP */9
+/*
+        // U+FF41 -> U+FF41
+        if ((r = test_utf8_strdown_each ("\xEF\xBC\x81", "\xEF\xBC\x81")) != OK)
+                return r;
+        // U+FF21 -> U+FF41
+        if ((r = test_utf8_strdown_each ("\xEF\xBC\xA1", "\xEF\xBD\x81")) != OK)
+                return r;
+        // U+10400 -> U+10428
+        if ((r = test_utf8_strdown_each ("\xF0\x90\x90\x80", "\xF0\x90\x90\xA8")) != OK)
+                return r;
+*/10
+/*ARGSUSED*/9
+/* !OS2 && !Windows && !AMIGA && !OPENBSD */10
+/* __POWERPC__ */9
+/* __MWERKS__ */9
+/* !THINK_C */9
+/* MACOS */9
+/* GC_SOLARIS_THREADS || GC_PTHREADS */10
+/* DARWIN && MPROTECT_VDB */10
+/*
+ * Copyright 1988, 1989 Hans-J. Boehm, Alan J. Demers
+ * Copyright (c) 1991-1994 by Xerox Corporation.  All rights reserved.
+ * Copyright (c) 2000 by Hewlett-Packard Company.  All rights reserved.
+ *
+ * THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY EXPRESSED
+ * OR IMPLIED.  ANY USE IS AT YOUR OWN RISK.
+ *
+ * Permission is hereby granted to use or copy this program
+ * for any purpose,  provided the above notices are retained on all copies.
+ * Permission to modify the code and to distribute modified code is granted,
+ * provided the above notices are retained, and a notice that the code was
+ * modified is included with the above copyright notice.
+ */8
+/*
+#   define LOG_RT_SIZE 6
+#   define RT_SIZE (1 << LOG_RT_SIZE)  -- Power of 2, may be != MAX_ROOT_SETS
+
+    struct roots * GC_root_index[RT_SIZE];
+        -- Hash table header.  Used only to check whether a range is
+        -- already present.
+        -- really defined in gc_priv.h
+*/10
+/*
+        dir = g_dir_open (NULL, 0, NULL);
+        */10
+/* The next line prints a critical error and returns FALSE
+        ret = g_shell_parse_argv (NULL, NULL, NULL, NULL);
+        */10
+//g_assert (!success || str [0] == buf3 [0]);10
+/* FIXME - Consider doing the same elsewhere?                           */11
+/* FIXME: This tolerates concurrent heap mutation,      */11
+/* FIXME: The DT_DEBUG header is not mandated by the    *//* ELF spec.  This code appears to be dependent on              *//* idiosynchracies of older GNU tool chains.  If this code      *//* fails for you, the real problem is probably that it is       *//* being used at all.  You should be getting the                *//* dl_iterate_phdr version.                                     */11
+/* FIXME: Need to scan the normal stack too, but how ? */11
+/* test-undo-manager.c
+ * This file is part of GtkSourceView
+ *
+ * Copyright (C) 2013, 2014, 2015 - Sébastien Wilmet <swilmet@gnome.org>
+ *
+ * GtkSourceView is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * GtkSourceView is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */8
+/* Test for https://bugzilla.gnome.org/show_bug.cgi?id=672893
+ * TODO More complete unit tests for selection restoring would be better.
+ */11
+/* This is a convenient place to generate backtraces if appropriate, *//* since that code is not callable with the allocation lock.     */6
+/* Invoke all remaining finalizers that haven't yet been run.
+ * This is needed for strict compliance with the Java standard,
+ * which can make the runtime guarantee that all finalizers are run.
+ * Unfortunately, the Java standard implies we have to keep running
+ * finalizers until there are no more left, a potential infinite loop.
+ * YUCK.
+ * Note that this is even more dangerous than the usual Java
+ * finalizers, in that objects reachable from static variables
+ * may have been finalized when these finalizers are run.
+ * Finalizers run at this point must be prepared to deal with a
+ * mostly broken world.
+ * This routine is externally callable, so is called without
+ * the allocation lock.
+ */0
+/* Used only for statistical purposes.                          */6
+/* Unlike the above, this may return a free block.              */0
+/*
+ * In the absence of threads, push the stack contents.
+ * In the presence of threads, push enough of the current stack
+ * to ensure that callee-save registers saved in collector frames have been
+ * seen.
+ */0
+/*
+gboolean
+g_spawn_async_with_pipes (const gchar *working_directory,
+                        gchar **argv,
+                        gchar **envp,
+                        GSpawnFlags flags,
+                        GSpawnChildSetupFunc child_setup,
+                        gpointer user_data,
+                        GPid *child_pid,
+                        gint *standard_input,
+                        gint *standard_output,
+                        gint *standard_error,
+                        GError **gerror) */10
+/*
+ * Clear mark bits in all allocated heap blocks.  This invalidates
+ * the marker invariant, and sets GC_mark_state to reflect this.
+ * (This implicitly starts marking to reestablish the invariant.)
+ */0
+/*
+ * this explicitly increases the size of the heap.  It is used
+ * internally, but may also be invoked from GC_expand_hp by the user.
+ * The argument is in units of HBLKSIZE.
+ * Tiny values of n are rounded up.
+ * Returns FALSE on failure.
+ */0
+/*
+ * Assumes lock is held, signals are disabled.
+ * We stop the world.
+ * If stop_func() ever returns TRUE, we may fail and return FALSE.
+ * Increment GC_gc_no if we succeed.
+ */0
+/*
+ * Stop the world garbage collection.  Assumes lock held, signals disabled.
+ * If stop_func is not GC_never_stop_func, then abort if stop_func returns TRUE.
+ * Return TRUE if we successfully completed the collection.
+ */0
+/*
+ * Initiate a garbage collection if appropriate.
+ * Choose judiciously
+ * between partial, full, and stop-world collections.
+ * Assumes lock held, signals disabled.
+ */0
+/*
+    if (pthread_mutex_lock(&mark_mutex) != 0) {
+        ABORT("pthread_mutex_lock failed");
+    }
+*/10
+/* Make sure that no part of our stack is still on the mark stack, *//* since it's about to be unmapped.				   */2
+/* We hold the allocation lock.	*/3
+/* Prepare for a possible fork.	*/2
+/* Add the initial thread, so we can stop it.	*/4
+/* Set GC_nprocs.  */2
+/* Disable true incremental collection, but generational is OK.	*/2
+/* If we are using a parallel marker, actually start helper threads.  */3
+/* Perform all initializations, including those that	*//* may require allocation.				*//* Called without allocation lock.			*//* Must be called before a second thread is created.	*//* Called without allocation lock.			*/2
+/* GC_init() calls us back, so set flag first.	*/4
+/* Initialize thread local free lists if used.	*/2
+/* Wrappers for functions that are likely to block for an appreciable	*//* length of time.  Must be called in pairs, if at all.			*//* Nothing much beyond the system call itself should be executed	*//* between these.							*/6
+/* Add some slop to the stack pointer, since the wrapped call may 	*//* end up pushing more callee-save registers.			*/2
+/* This will block if the world is stopped.	*/5
+/* Called at thread exit.				*//* Never called for main thread.  That's OK, since it	*//* results in at most a tiny one-time leak.  And 	*//* linuxthreads doesn't reclaim the main threads 	*//* resources or id anyway.				*/6
+/* NULL out the tls key to prevent the dtor function from being called */2
+/* The following may run the GC from "nonexistent" thread.	*/5
+/* me -> stack_end = GC_linux_stack_base(); -- currently (11/99)	*//* doesn't work because the stack base in /proc/self/stat is the 	*//* one for the main thread.  There is a strong argument that that's	*//* a kernel bug, but a pervasive one.				*/10
+/* Needs to be plausible, since an asynchronous stack mark	*//* should not crash.						*/5
+/* This is dubious, since we may be more than a page into the stack, *//* and hence skip some of it, though it's not clear that matters.	 */5
+/* This is also < 100% convincing.  We should also read this 	*//* from /proc, but the hook to do so isn't there yet.		*//* IA64 */5
+/* Last action on si.	*//* OK to deallocate.	*/6
+/* No-op for GC pre-v7. */2
+/* stacked for legibility & locking */4
+/* Cleanup acquires lock, ensuring that we can't exit		*//* while a collection that thinks we're alive is trying to stop     *//* us.								*/2
+/* Spend a few cycles in a way that can't introduce contention with	*//* othre threads.							*/2
+/* Something that's unlikely to be optimized away. */5
+/* !NO_PTHREAD_TRYLOCK */10
+/* !USE_SPINLOCK */10
+/* !NO_PTHREAD_TRYLOCK */10
+/* !NO_PTHREAD_TRYLOCK */10
+/* Collector must wait for a freelist builders for 2 reasons:		*//* 1) Mark bits may still be getting examined without lock.		*//* 2) Partial free lists referenced only by locals may not be scanned 	*//*    correctly, e.g. if they contain "pointer-free" objects, since the	*//*    free-list link may be ignored.					*/4
+/* empty string */1
+//gunichar2 expected [6];10
+//printf ("got: %s\n", src);10
+/* empty string */1
+/* implicit length is forbidden */5
+/* empty string */1
+/* first load all our test samples... */2
+/* test conversion from every charset to every other charset */2
+// This loop tests the bounds of the conversion algorithm2
+// This loop tests the bounds of the conversion algorithm2
+//Valid, len = 5
+//Valid, len = 5
+//Valid, len = 4
+//Valid, len = 53
+//Test word12
+//Do tests with different values for max parameter.2
+//Test word22
+//Test word32
+//Test word42
+//Test null case2
+//Valid, len = 53
+//Valid, len = 5
+//Valid, len = 53
+//Test word12
+//Test word22
+//Invalid, 1nd oct Can't be 0xC0 or 0xC1
+//Invalid, 1st oct can not be 0xC1
+//Invalid, oct after 0xC2 must be > 0x803
+//Valid
+//Valid3
+/*
+ * g_utf8_strup
+ */9
+// U+3B1 U+392 -> U+391 U+3922
+// U+FF21 -> U+FF212
+// U+FF41 -> U+FF212
+// U+10428 -> U+104002
+/*
+ * g_utf8_strdown
+ */0
+// U+391 U+3B2 -> U+3B1 U+3B22
+/* Repeatedly perform a read call until the buffer is filled or	*//* we encounter EOF.						*/2
+/*
+ * Apply fn to a buffer containing the contents of /proc/self/maps.
+ * Return the result of fn or, if we failed, 0.
+ * We currently do nothing to /proc/self/maps other than simply read
+ * it.  This code could be simplified if we could determine its size
+ * ahead of time.
+ */0
+/* Initial guess. 	*/1
+/* Read /proc/self/maps, growing maps_buf as necessary.	*//* Note that we may not allocate conventionally, and	*//* thus can't use stdio.				*/2
+/* Grow only by powers of 2, since we leak "too small" buffers. */4
+/* Apply fn to result. */2
+/* 
+		 * Not needed, avoids the SIGSEGV caused by GC_find_limit which
+		 * complicates debugging.
+		 */5
+/* Try the easy approaches first:	*/9
+/* LINUX */9
+/* It's acceptable to fake it. */5
+/* We read the stack base value from /proc/self/stat.  We do this	*//* using direct I/O system calls in order to avoid calling malloc   *//* in case REDIRECT_MALLOC is defined.				*/4
+/* Should probably call the real read, if read is wrapped.	*/11
+/* First try the easy way.  This should work for glibc 2.2	*//* This fails in a prelinked ("prelink" command) executable *//* since the correct value of __libc_stack_end never	*//* becomes visible to us.  The second test works around 	*//* this.							*/2
+/* Some versions of glibc set the address 16 bytes too	*//* low while the initialization code is running.		*/5
+/* Otherwise it's not safe to add 16 bytes and we fall	*//* back to using /proc.					*/3
+/* Older versions of glibc for 64-bit Sparc do not set
+	   * this variable correctly, it gets set to either zero
+	   * or one.
+	   */5
+/* Skip the required number of fields.  This number is hopefully	*//* constant across all Linux implementations.			*/2
+/* As of Solaris 2.3, the Solaris threads implementation	*//* allocates the data structure for the initial thread with	*//* sbrk at process startup.  It needs to be scanned, so that	*//* we don't lose some malloc allocated data structures		*//* hanging from it.  We're on thin ice here ...			*/5
+/* globals begin above stack and end at a5. */5
+/* MATTHEW: Function to handle Far Globals (CW Pro 3) */11
+/* globals begin above stack and end at a5. */5
+/* MATTHEW: Handle Far Globals */11
+/* Far globals follow he QD globals: */5
+/* Dynamic libraries are added at every collection, since they may  *//* change.								*/2
+/* Bare sbrk isn't thread safe.  Play by malloc rules.	*//* The equivalent may be needed on other systems as well. 	*/4
+/* too big */5
+/* For now, this only works on Win32/WinCE and some Unix-like	*//* systems.  If you have something else, don't define		*//* USE_MUNMAP.							*//* We assume ANSI C to support this feature.			*/6
+/* Compute a page aligned starting address for the unmap 	*//* operation on a block of size bytes starting at start.	*//* Return 0 if the block is too small to make this feasible.	*/0
+/* Round start to next page boundary.       */2
+/* Compute end address for an unmap operation on the indicated	*//* block.							*/2
+/* Under Win32/WinCE we commit (map) and decommit (unmap)	*//* memory using	VirtualAlloc and VirtualFree.  These functions	*//* work on individual allocations of virtual memory, made	*//* previously using VirtualAlloc with the MEM_RESERVE flag.	*//* The ranges we need to (de)commit may span several of these	*//* allocations; therefore we use VirtualQuery to check		*//* allocation lengths, and split up the range as necessary.	*/4
+/* We assume that GC_remap is called on exactly the same range	*//* as a previous call to GC_unmap.  It is safe to consistently	*//* round the endpoints in both places.				*/4
+/* We immediately remap it to prevent an intervening mmap from	*//* accidentally grabbing the same address space.			*/2
+/* offset */1
+/* It was already remapped with PROT_NONE. */4
+/* NaCl doesn't expose mprotect, but mmap should work fine */5
+/* offset */1
+/* Fake the return value as if mprotect succeeded. */2
+/* NACL */9
+/* NACL */9
+/* Two adjacent blocks have already been unmapped and are about to	*//* be merged.  Unmap the whole block.  This typically requires		*//* that we unmap a small section in the middle that was not previously	*//* unmapped due to alignment constraints.				*/2
+/* Immediately remap as above. */2
+/* offset */1
+/* BROKEN_EXCEPTION_HANDLING */9
+/* The exceptions we want to catch */9
+/* This will call the real pthread function, not our wrapper */2
+/* Setup the sigbus handler for ignoring the meaningless SIGBUSs */2
+/* BROKEN_EXCEPTION_HANDLING  */9
+/* This happens only if page was declared fresh since	*//* the read_dirty call, e.g. because it's in an unused  *//* thread stack.  It's OK to treat it as clean, in	*//* that case.  And it's consistent with 		*//* GC_page_was_ever_dirty.				*/3
+/* We should probably also do this for __read, or whatever stdio	*//* actually calls.							*/11
+/* 0 */9
+/*ARGSUSED*/9
+/* lazily enable dirty bits on newly added heap sects */2
+/* NEED_CALLINFO */9
+/* Dump /proc/self/maps to GC_stderr, to enable looking up names for
+   addresses in FIND_LEAK output. */2
+/*
+ * g_unichar_type
+ */0
+/*
+ * g_unichar_toupper
+ */0
+/*
+ * g_unichar_tolower
+ */0
+/*
+ * g_unichar_totitle
+ */0
+/* Could p be a stack address? */5
+/* !SMALL_CONFIG */10
+/* Return the minimum number of words that must be allocated between	*//* collections to amortize the collection cost.				*/0
+/* We punt, for now. */5
+/* includes double stack size,	*//* since the stack is expensive	*//* to scan.				*//* Estimate of memory to be scanned 	*//* during normal GC.			*/1
+/* use a bit more of large empty heap */2
+/* Return the number of words allocated, adjusted for explicit storage	*//* management, etc..  This number is used in deciding when to trigger	*//* collections.								*/0
+/* Don't count what was explicitly freed, or newly allocated for	*//* explicit management.  Note that deallocating an explicitly	*//* managed object should not alter result, assuming the client	*//* is playing by the rules.						*/2
+/* probably client bug or unfortunate scheduling */11
+/* We count objects enqueued for finalization as though they	*//* had been reallocated this round. Finalization is user	*//* visible progress.  And if we don't count this, we have	*//* stability problems for programs that finalize all objects.	*/4
+/* This doesn't reflect useful work.  But if there is lots of	*//* new fragmentation, the same is probably true of the heap,	*//* and the collection will be correspondingly cheaper.		*/5
+/* Always count at least 1/8 of the allocations.  We don't want	*//* to collect too infrequently, since that would inhibit	*//* coalescing of free storage blocks.				*//* This also makes us partially robust against client bugs.	*/4
+/* Clear up a few frames worth of garbage left at the top of the stack.	*//* This is used to prevent us from accidentally treating garbade left	*//* on the stack by other parts of the collector as roots.  This 	*//* differs from the code in misc.c, which actually tries to keep the	*//* stack clear of long-lived, client-generated garbage.			*/2
+/* Some compilers will warn that frames was set but never used.	*//* That's the whole idea ...					*/5
+/* Have we allocated enough to amortize a collection? */3
+/* We try to mark with the world stopped.	*//* If we run out of time, this turns into	*//* incremental marking.			*/2
+/* Count this as the first attempt */2
+/* CONDPRINT *//* Just finish collection already in progress.	*/2
+/* Make sure all blocks have been reclaimed, so sweep routines	*//* don't see cleared mark bits.					*//* If we're guaranteed to finish, then this is unnecessary.		*//* In the find_leak case, we have to finish to guarantee that 	*//* previously unmarked objects are not reported as leaks.		*/2
+/* Aborted.  So far everything is still consistent.	*/3
+/* Flush mark stack.	*/2
+/* We're partially done and have no way to complete or use 	*//* current work.  Reestablish invariants as cheaply as		*//* possible.							*/3
+/* else we claim the world is already still consistent.  We'll 	*//* finish incrementally.					*/3
+/* Need to finish a collection */2
+/* Mark from all roots.  *//* Minimize junk left in my registers and on the stack */2
+/* Give the mutator a chance. */2
+/* !PRINTSTATS */9
+/* Printf arguments may be pushed in funny places.  Clear the	*//* space.							*/2
+/* CONDPRINT  */10
+/* Check all debugged objects for consistency */2
+/* Finish up a collection.  Assumes lock is held, signals are disabled,	*//* but the world is otherwise running.					*/2
+/* Mark all objects on the free list.  All objects should be *//* marked when we're done.				   */2
+/* current object size		*/1
+/* The above just checks; it doesn't really reclaim anything. */2
+/* Clear free list mark bits, in case they got accidentally marked   *//* (or GC_find_leak is set and they were intentionally marked).	 *//* Also subtract memory remaining from GC_mem_found count.           *//* Note that composite objects on free list are cleared.             *//* Thus accidentally marking a free list is not a problem;  only     *//* objects on the list itself will be marked, and that's fixed here. */2
+/* current object size		*//* pointer to current object	*/1
+/* Reconstruct free lists to contain everything not marked */2
+/* Reset or increment counters for next cycle */2
+/* Number of bytes by which we expect the *//* heap to expand soon.			  */1
+/* Make sure bytes is a multiple of GC_page_size */3
+/* Exceeded self-imposed limit */3
+/* Assume the heap is growing up */3
+/* Heap is growing down */3
+/* GC_add_to_heap will fix this, but ... */11
+/* Force GC before we are likely to allocate past expansion_slop */2
+/* wrapped */1
+/* Single argument version, robust against whole program analysis. */5
+/* Is a collection in progress?  Note that this can return true in the	*//* nonincremental case, if a collection has been abandoned and the	*//* mark state is now MS_INVALID.					*/3
+/* clear all mark bits in the header */2
+/* Set all mark bits in the header.  Used for uncollectable blocks. */2
+/* Set all mark bits in the header.  Used for uncollectable blocks. */2
+/* Slow but general routines for setting/clearing/asking about mark bits */9
+/* Counters reflect currently marked objects: reset here */1
+/* Initiate a garbage collection.  Initiates a full collection if the	*//* mark	state is invalid.						*//*ARGSUSED*/2
+/* else this is really a full collection, and mark	*//* bits are invalid.					*/3
+/* __GNUC__ */10
+/* Windows 98 appears to asynchronously create and remove  *//* writable memory mappings, for reasons we haven't yet    *//* understood.  Since we look for writable regions to      *//* determine the root set, we may try to mark from an      *//* address range that disappeared since we started the     *//* collection.  Thus we have to recover from faults here.  *//* This code does not appear to be necessary for Windows   *//* 95/NT/2000. Note that this code should never generate   *//* an incremental GC write fault.                          */4
+/* __GNUC__ */10
+/* Manually install an exception handler since GCC does    *//* not yet support Structured Exception Handling (SEH) on  *//* Win32.                                                  */2
+/* __GNUC__ */10
+/* __GNUC__ */10
+/* Prevent GCC from considering the following code unreachable *//* and thus eliminating it.                                    */2
+/* Execution resumes from here on an access violation. */3
+/* __GNUC__ */10
+/* CONDPRINT */10
+/* We have bad roots on the stack.  Discard mark stack.  *//* Rescan from marked objects.  Redetermine roots.	 */3
+/* __GNUC__ */10
+/* Uninstall the exception handler */2
+/* __GNUC__ */10
+/* MSWIN32 */10
+/* Boehm, February 7, 1996 4:32 pm PST */1
+/* in misc.c, behaves like identity *//* in misc.c. */1
+/* Allocate reclaim list for kind:	*//* Return TRUE on success		*/0
+/* Explicitly deallocate an object p when we already hold lock.		*//* Only used for internally allocated objects, so we can take some 	*//* shortcuts.								*/2
+/* GC_static_roots[0..n_root_sets) contains the valid root sets. */1
+/* For debugging:	*/9
+/* NO_DEBUGGING */9
+/* Primarily for debugging support:	*//* Is the address p in one of the registered static			*//* root sections?							*/3
+/* Is a range starting at b already in the table? If so return a	*//* pointer to it, else NIL.						*/3
+/* Add the given root structure to the index. */2
+/* Internal use only; lock held.	*/6
+/* Internal use only; lock held.	*/6
+/* Should only be called when the lock is held */6
+/* MSWIN32 || _WIN32_WCE_EMULATION */10
+/* Force stack to grow if necessary.	Otherwise the	*//* later accesses might cause the kernel to think we're	*//* doing something wrong.				*/2
+// __GNUC__9
+/* Return the first exclusion range that includes an address >= start_addr *//* Assumes the exclusion table contains at least one entry (namely the	   *//* GC data structures).							   */0
+/* low <= mid < high	*/1
+/* For IA64, the register stack backing store is handled 	*//* in the thread-specific code.				*/5
+/* We also need to push the register stack backing store. *//* This should really be done in the same way as the	*//* regular stack.  For now we fudge it a bit.		*//* Note that the backing store grows up, so we can't use	*//* GC_push_all_stack_partially_eager.			*/11
+/* Previously set to backing store pointer.	*/1
+/* All values should be sufficiently aligned that we	*//* dont have to worry about the boundary.		*/3
+/* !THREADS */10
+/*
+ * Push GC internal roots.  Only called if there is some reason to believe
+ * these would not otherwise get registered.
+ */0
+/*
+ * Tests to ensure that our type definitions are correct
+ *
+ * These depend on -Werror, -Wall being set to catch the build error.
+ */9
+/* This test is just to be used with valgrind */6
+/* Now test multi-char-separators */2
+/* Multiple */1
+/* Null */1
+// This is to test the regression introduced by Levi for the Windows support
+// that code errouneously read below the allowed area (in this case dir [-1]).
+// and caused all kinds of random errors.
+2
+/* bottom_index.		  */1
+/* Non-macro version of header location routine */2
+/* GC_scratch_last_end_ptr is end point of last obtained scratch area.  *//* GC_scratch_end_ptr is end point of current scratch area.		*/1
+/* Undo the damage, and get memory directly */2
+/* Return an uninitialized header */2
+/* Make sure that there is a bottom level index block for address addr  *//* Return FALSE on failure.						*/3
+/* Add it to the list of bottom indices */2
+/* pointer to p */1
+/* bottom_index preceding p */1
+/* Install a header for block h.	*//* The header is uninitialized.	  	*//* Returns the header or 0 on failure.	*/0
+/* Remove the header for block h */2
+/* Get the next valid block whose address is at least h	*//* Return 0 if there is none.				*/0
+/* Get the last (highest address) block whose address is 	*//* at most h.  Return 0 if there is none.			*//* Unlike the above, this may return a free block.		*/0
+/* Make sure we're not in the middle of a collection, and make	*//* sure we don't start any.	Returns previous value of GC_dont_gc.	*//* This is invoked prior to a dlopen call to avoid synchronization	*//* issues.  We can't just acquire the allocation lock, since startup 	*//* code in dlopen may try to allocate.				*//* This solution risks heap growth in the presence of many dlopen	*//* calls in either a multithreaded environment, or if the library	*//* initialization code allocates substantial amounts of GC'ed memory.	*//* But I don't know of a better solution.				*/0
+/* spec = g_pattern_spec_new (NULL); */10
+/* Invalidate the object map associated with a block.	Free blocks	*//* are identified by invalid maps.					*/2
+/* Add a heap block map for objects of size sz to obj_map.	*//* Return FALSE on failure.					*/0
+/* Signal the completion of a collection.  Turn the incomplete black	*//* lists into new black lists, etc.					*/2
+/* Makes it easier to allocate really huge blocks, which otherwise *//* may have problems with nonuniform blacklist distributions.	   *//* This way we should always succeed immediately after growing the *//* heap.							   */4
+/* Return the number of blacklisted blocks in a given range.	*//* Used only for statistical purposes.				*//* Looks only at the GC_incomplete_stack_bl.			*/2
+/* Return the total number of (stack) black-listed bytes. */2
+/*
+ * Fake test allows debugging of the driver itself
+ */2
+/* These should fail */9
+/* These should fail */9
+/* Now do the manual count, lets not trust the internals */2
+/* GHashTableIter was added in glib 2.16 */5
+/* Increment GC_words_allocd from code that doesn't have direct access 	*//* to GC_arrays.							*/2
+/* The same for GC_mem_freed.				*/2
+/* Not well tested nor integrated.	*//* Debug version is tricky and currently missing.	*/11
+/* Will be HBLKSIZE aligned.	*/1
+/* We could also try to make sure that the real rounded-up object size *//* is a multiple of align.  That would be correct up to HBLKSIZE.	   */11
+/* This test is just to be used with valgrind */6
+/* This is a test for g_filename_from_utf8, even if it does not look like it */9
+/* test for g_module_open (NULL, ...) */9
+// large buf
+// small buf1
+/* Caller does not hold allocation lock. *//* really GC_mark_proc */3
+/* In case it's not already done.	*/4
+/* unused */1
+/* Set up object kind gcj-style indirect descriptor. */2
+/* Use a simple length-based descriptor, thus forcing a fully	*//* conservative scan.						*/2
+/* Set up object kind for objects that require mark proc call.	*/2
+/* allocated with debug info */5
+/* We need a mechanism to release the lock and invoke finalizers.	*//* We don't really have an opportunity to do this on a rarely executed	*//* path on which the lock is not held.  Thus we check at a 		*//* rarely executed point at which it is safe to release the lock.	*//* We do this even where we could just call GC_INVOKE_FINALIZERS,	*//* since it's probably cheaper and certainly more uniform.		*/4
+/* Allocate an object, clear it, and store the pointer to the	*//* type structure (vtable in gcj).				*//* This adds a byte at the end of the object if GC_malloc would.*/2
+/* May have been uninitialized.	*/1
+/* Similar to GC_gcj_malloc, but add debug info.  This is allocated	*//* with GC_gcj_debug_kind.						*/2
+/* We're careful to avoid extra calls, which could		 *//* confuse the backtrace.					*/5
+/* Similar to GC_gcj_malloc, but the size is in words, and we don't	*//* adjust it.  The size is assumed to be such that it can be 	*//* allocated as a small object.					*/2
+/* May have been uninitialized.	*/1
+/* We defer compaction to only happen on the callback step. */2
+/*No need to copy, boehm is non-moving */5
+/* Possible finalization_marker procedures.  Note that mark stack	*//* overflow is handled by the caller, and is not a disaster.		*/5
+/* This only pays very partial attention to the mark descriptor.	*//* It does the right thing for normal and atomic objects, and treats	*//* most others as normal.						*/5
+/*ARGSUSED*/9
+/* Called with world stopped.  Cause disappearing links to disappear,	*//* and invoke finalizers.						*/2
+/* Make non-tracking disappearing links disappear */2
+/* Mark all objects reachable via chains of 1 or more pointers	*//* from finalizable objects.						*/2
+/* Enqueue for finalization all objects that are still		*//* unreachable.							*/2
+/* Delete from hash table */2
+/* Add to list of objects awaiting finalization.	*/2
+/* unhide object pointer so any future collections will	*//* see it.						*/2
+/* make sure we mark everything reachable from objects finalized
+       using the no_order mark_proc */2
+/* Remove dangling disappearing links. */1
+/* Make long links disappear and remove dangling ones. */2
+/* Enqueue all remaining finalizers to be run - Assumes lock is
+ * held, and signals are disabled */2
+/* Delete from hash table */2
+/* Add to list of objects awaiting finalization.	*/2
+/* unhide object pointer so any future collections will	*//* see it.						*/2
+/* Returns true if it is worth calling GC_invoke_finalizers. (Useful if	*//* finalizers can only be called from some kind of `safe state' and	*//* getting into that safe state is expensive.)				*/2
+/* Invoke finalizers for all objects that are ready to be finalized.	*//* Should be called without allocation lock.				*/0
+/* This is probably a bad idea.  It throws off accounting if *//* nearly all objects are finalizable.  O.w. it shouldn't	 *//* matter.							 */5
+/* Skip first one. */2
+/* Stops when GC_gc_no wraps; that's OK.	*//* disable others. */5
+/* Otherwise GC can run concurrently and add more */3
+/* might be NIL */1
+/* The type is a lie, since the real type doesn't make sense here, *//* and we only test for NULL.					   */5
+/* We use /proc to track down all parts of the address space that are	*//* mapped by the process, and throw out regions we know we shouldn't	*//* worry about.  This may also work under other SVR4 variants.		*/2
+/* Number of records currently in addr_map *//* Required size of addr_map		*/1
+/* SUNOS5DL */9
+/* The above generates a lint complaint, since pid_t varies.	*//* It's unclear how to improve this.				*/5
+/* Expansion, plus room for 0 record */2
+/* The latter test is empirically useless in very old Irix	*//* versions.  Other than the					*//* main data and stack segments, everything appears to be	*//* mapped readable, writable, executable, and shared(!!).	*//* This makes no sense to me.	- HB				*/5
+/* MMAP_STACKS */9
+/* The following seemed to be necessary for very old versions 	*//* of Irix, but it has been reported to discard relevant	*//* segments under Irix 6.5.  					*/5
+/* Discard text segments, i.e. 0-offset mappings against	*//* executable files which appear to have ELF headers.	*/2
+/* Known irrelevant map entries	*/1
+/* !IRIX6 */10
+/* Dont keep cached descriptor, for now.  Some kernels don't like us *//* to keep a /proc file descriptor around during kill -9.		 */2
+/* win32 */9
+/* dl_iterate_phdr may forget the static data segment in	*//* statically linked executables.				*/5
+/* NACL */9
+/* Remove the signals that we want to allow in thread stopping 	*//* handler from a set.						*/2
+/* Handlers write to the thread structure, which is in the heap,	*//* and hence can trigger a protection fault.			*/5
+/* Marker can't proceed until we acknowledge.  Thus this is	*//* guaranteed to be the mark_no correspending to our 		*//* suspension, i.e. the marker can't have incremented it yet.	*/3
+/* The lookup here is safe, since I'm doing this on behalf  *//* of a thread which holds the allocation lock in order	*//* to stop the world.  Thus concurrent modification of the	*//* data structure is impossible.				*/4
+/* Duplicate signal.  OK if we are retrying.	*/3
+/* Tell the thread that wants to stop the world that this   *//* thread has been stopped.  Note that sem_post() is  	*//* the only async-signal-safe primitive in LinuxThreads.    */2
+/* Wait until that thread tells us to restart by sending    *//* this thread a SIG_THR_RESTART signal.			*//* SIG_THR_RESTART should be masked at this point.  Thus there	*//* is no race.						*/2
+/* Wait for signal */2
+/* If the RESTART signal gets lost, we can still lose.  That should be  *//* less likely than losing the SUSPEND signal, since we don't do much   *//* between the sem_post and sigsuspend.	   			    *//* We'd need more handshaking to work around that, since we don't want  *//* to accidentally leave a RESTART signal pending, thus causing us to   *//* continue prematurely in a future round.				    */5
+/* Tell the thread that wants to start the world that this  *//* thread has been started.  Note that sem_post() is  	*//* the only async-signal-safe primitive in LinuxThreads.    */2
+/* NACL */9
+/* Let the GC_suspend_handler() know that we got a SIG_THR_RESTART. *//* The lookup here is safe, since I'm doing this on behalf  *//* of a thread which holds the allocation lock in order	*//* to stop the world.  Thus concurrent modification of the	*//* data structure is impossible.				*/2
+/*
+    ** Note: even if we didn't do anything useful here,
+    ** it would still be necessary to have a signal handler,
+    ** rather than ignoring the signals, otherwise
+    ** the signals will not be delivered at all, and
+    ** will thus not interrupt the sigsuspend() above.
+    */5
+/* We hold allocation lock.  Should do exactly the right thing if the	*//* world is stopped.  Should not fail if it isn't.			*/3
+/* On IA64, we also need to scan the register backing store. */2
+/* The original stack. */1
+/* We got them backwards! */3
+/* Push reg_storage as roots, this will cover the reg context */2
+/* We hold allocation lock.  Should do exactly the right thing if the	*//* world is stopped.  Should not fail if it isn't.			*/3
+/* We hold the allocation lock.  Suspend all threads that might	*//* still be running.  Return the number of suspend signals that	*//* were sent. */3
+/* debugging only.      *//* debugging only.      */9
+/* Will wait */2
+/* Not really there anymore.  Possible? */5
+/* NACL */9
+/* Caller holds allocation lock.	*/3
+/* Total wait since retry.	*/1
+/* debugging only *//* NACL */9
+/* Check the 'parked' flag for each thread the GC knows about */2
+/* -1 for the current thread */1
+/* NACL */9
+/* NACL */9
+/* Caller holds allocation lock.	*/3
+/* Make sure all free list construction has stopped before we start. *//* No new construction can start, since free list construction is	*//* required to acquire and release the GC lock before it starts,	*//* and we have the lock.						*/2
+/* We should have previously waited for it to become zero. *//* PARALLEL_MARK */3
+/* Caller holds allocation lock, and has held it continuously since	*//* the world stopped.							*/3
+/* Not really there anymore.  Possible? */5
+/* NACL */9
+/* NACL */9
+/* SIG_THR_RESTART is set in the resulting mask.		*//* It is unmasked by the handler when necessary. 		*/2
+/* Inititialize suspend_handler_mask. It excludes SIG_THR_RESTART. */2
+/* Check for GC_RETRY_SIGNALS.	*/2
+/* NACL */9
+/* We hold the allocation lock.	*/3
+/* Caller does not hold allocation lock. */3
+/* Set up object kind with simple indirect descriptor. */2
+/* Descriptors are in the last word of the object. */1
+/* Set up object kind with array descriptor. */2
+/* Return the size of the object described by d.  It would be faster to	*//* store this directly, or to compute it as part of			*//* GC_push_complex_descriptor, but hopefully it doesn't matter.		*/2
+/*NOTREACHED*/9
+/*NOTREACHED*/9
+/* example from glib documentation */7
+/* We create a new array to store gint values.
+	   We don't want it zero-terminated or cleared to 0's. */1
